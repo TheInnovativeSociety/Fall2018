@@ -2,10 +2,10 @@
 #     Fall 2018 | Web Scraper     #
 # --------------------------------#
 
-# Objectives:                                           
+# Objectives: 											
 
-# Find = [rent price, location, length of post, bed/bath, footprint]     
-# Site = duproprio.com                                               
+# Find = [rent price, location, length of post, bed/bath, footprint]	 
+# Site = duproprio.com												 
 
 # Libraries
 import requests
@@ -28,7 +28,7 @@ posting_elements = posting_list.find_all(class_="search-results-listings-list__i
 # "Open" csv to start writing scraped data
 with open("du_proprio_scraped.csv", "w") as csv_file:
     csv_writer = writer(csv_file)
-    csv_writer.writerow(["Rent Price", "Location", "# Bed", "# Bath", "Living Area", "Land Area"])
+    csv_writer.writerow(["Rent Price", "Location", "NumBed", "NumBath", "Living Area", "Land Area"])
 
     # Scrape desired variables from individual ads on search page "search-results-listings-list__item"
     for posting in posting_elements:
@@ -65,8 +65,8 @@ with open("du_proprio_scraped.csv", "w") as csv_file:
             elif char_name == 'Tailleduterrain':
                 land_val = char_val + 'pi^2'
 
-        # Write to csv file
-        csv_writer.writerow([price_val, location_val, bed_val, bath_val, livingarea_val, land_val])
+                # Write to csv file
+                csv_writer.writerow([price_val, location_val, bed_val, bath_val, livingarea_val, land_val])
 
         # "Length of post" variable not in version of ad on front page.
 
