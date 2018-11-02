@@ -13,60 +13,68 @@ from bs4 import BeautifulSoup
 from csv import writer
 import re
 
-# Add link
-url = "https://duproprio.com/fr/rechercher/liste?search=true&is_for_sale=1&with_builders=1&parent=1&pageNumber=1&sort=-published_at"
+# Set page count
+maxPage = 3
 
-# Initial scraper setup
-response = requests.get(url)
-soup = BeautifulSoup(response.text, "html.parser")
-container = soup.find(class_="container")
-posting_list = container.find(class_="search-results-listings-list")
-
-# List of postings
-posting_elements = posting_list.find_all(class_="search-results-listings-list__item")
-
-# "Open" csv to start writing scraped data
-with open("du_proprio_scraped.csv", "w") as csv_file:
+# "Open" csv to write header
+with open("du_proprio_scraped.csv", "a") as csv_file:
     csv_writer = writer(csv_file)
     csv_writer.writerow(["Rent Price", "Location", "NumBed", "NumBath", "Living Area", "Land Area"])
 
-    # Scrape desired variables from individual ads on search page "search-results-listings-list__item"
-    for posting in posting_elements:
-        # Prices
-        posting_price_elem = posting.find(class_="search-results-listings-list__item-description__price")
-        # Location
-        location_elem = posting.find(class_="search-results-listings-list__item-description__item search-results-listings-list__item-description__city")
-        # Other characteristics
-        characteristic_elem = posting.find_all(class_="search-results-listings-list__item-description__characteristics__item")
+# Add link
+for pgnum in range(1,maxPage):
+    url = "https://duproprio.com/fr/rechercher/liste?search=true&is_for_sale=1&with_builders=1&parent=1&pageNumber=" + str(pgnum) + "&sort=-published_at"
 
-        # Extracting individual elements for each variable scraped above.
-        if posting_price_elem is not None:
-            price_val = posting_price_elem.find("h2").text
+    # Initial scraper setup
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    container = soup.find(class_="container")
+    posting_list = container.find(class_="search-results-listings-list")
 
-        if location_elem is not None:
-            location_val = location_elem.find("span").text
+    # List of postings
+    posting_elements = posting_list.find_all(class_="search-results-listings-list__item")
 
-        # Dealing with un-formatted output from website (cutting out whitespace and splitting at integer value)
-        for x in characteristic_elem:
-            if x is not None:
-                criteria = re.compile("([a-zA-Z]+)([0-9]+)")
-                char_name = criteria.match(re.sub(r"\W", "", x.text)).group(1)
-                char_val = criteria.match(re.sub(r"\W", "", x.text)).group(2)
+    # "Open" csv to start writing scraped data
+    with open("du_proprio_scraped.csv", "a") as csv_file:
+        csv_writer = writer(csv_file)
 
-            if char_name == 'Chambres':
-                bed_val = char_val
-            elif char_name == 'SallesdebainSallesdeau':
-                if char_val in ('11', '21', '31', '41', '51', '61', '12', '22', '32', '42', '52', '62'):  # Taking care of the "+1" and "+2" bathroom cases
-                    bath_val = char_val[0] + "+" + char_val[1]
-                else:
-                    bath_val = char_val
-            elif char_name == 'Airehabitablessolexclu':
-                livingarea_val = char_val + 'pi^2'
-            elif char_name == 'Tailleduterrain':
-                land_val = char_val + 'pi^2'
+        # Scrape desired variables from individual ads on search page "search-results-listings-list__item"
+        for posting in posting_elements:
+            # Prices
+            posting_price_elem = posting.find(class_="search-results-listings-list__item-description__price")
+            # Location
+            location_elem = posting.find(class_="search-results-listings-list__item-description__item search-results-listings-list__item-description__city")
+            # Other characteristics
+            characteristic_elem = posting.find_all(class_="search-results-listings-list__item-description__characteristics__item")
 
-                # Write to csv file
-                csv_writer.writerow([price_val, location_val, bed_val, bath_val, livingarea_val, land_val])
+            # Extracting individual elements for each variable scraped above.
+            if posting_price_elem is not None:
+                price_val = posting_price_elem.find("h2").text
+
+            if location_elem is not None:
+                location_val = location_elem.find("span").text
+
+            # Dealing with un-formatted output from website (cutting out whitespace and splitting at integer value)
+            for x in characteristic_elem:
+                if x is not None:
+                    criteria = re.compile("([a-zA-Z]+)([0-9]+)")
+                    char_name = criteria.match(re.sub(r"\W", "", x.text)).group(1)
+                    char_val = criteria.match(re.sub(r"\W", "", x.text)).group(2)
+
+                if char_name == 'Chambres':
+                    bed_val = char_val
+                elif char_name == 'SallesdebainSallesdeau':
+                    if char_val in ('11', '21', '31', '41', '51', '61', '12', '22', '32', '42', '52', '62'):  # Taking care of the "+1" and "+2" bathroom cases
+                        bath_val = char_val[0] + "+" + char_val[1]
+                    else:
+                        bath_val = char_val
+                elif char_name == 'Airehabitablessolexclu':
+                    livingarea_val = char_val + 'pi^2'
+                elif char_name == 'Tailleduterrain':
+                    land_val = char_val + 'pi^2'
+
+                    # Write to csv file
+                    csv_writer.writerow([price_val, location_val, bed_val, bath_val, livingarea_val, land_val])
 
         # "Length of post" variable not in version of ad on front page.
 
