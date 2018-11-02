@@ -13,8 +13,8 @@ from bs4 import BeautifulSoup
 from csv import writer
 import re
 
-# Set page count
-maxPage = 150
+# Set page count (maximum available at time of writing: 2163 pages)
+maxPage = 2163
 
 # "Open" csv to write header
 with open('du_proprio_scraped.csv', "w") as csv_file:
