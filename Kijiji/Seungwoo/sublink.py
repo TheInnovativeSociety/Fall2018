@@ -23,6 +23,9 @@ length = len(informationDIV)
 for j in range(4):
     for i in range(len(informationDIV)):  # loops over how # of results per page and puts data intodictionary
         titles = soup.select('div .info-container > .title > a')
+        for k in range(len(titles)):
+            sublink = 'http://www.kijiji.ca' + titles[k].get('href')
+            print(sublink)
         removeNewline = titles[i].getText()
         titleList.append(removeNewline.replace("\n", ""))
         outputWriter.writerow([titleList[length * j + i]])
