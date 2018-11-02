@@ -18,26 +18,24 @@ informationDIV = soup.select('div .info-container') #information we want is in a
 
 titleList = []      #empty dictionary to store title and rent
 rentList = []
-
-
+length = len(informationDIV)
 for j in range(4):
     for i in range(len(informationDIV)):#loops over how # of results per page and puts data intodictionary
         titles = soup.select('div .info-container > .title > a')
         removeNewline = titles[i].getText()
         titleList.append(removeNewline.replace("\n", ""))
-        outputWriter.writerow([titleList[i]])
+        outputWriter.writerow([titleList[length*j+i]])
                     
         rents = soup.select('div .price')
         removeNewline = rents[i].getText()
         rentList.append(removeNewline.replace("\n", "").replace("\xa0",""))
-        outputWriter.writerow([rentList[i]])
+        outputWriter.writerow([rentList[length*j+i]])
     nextpageLink = soup.select('a[title="Suivante"]')[0]
     url = 'http://www.kijiji.ca' + nextpageLink.get('href')
-    print(url)
     res = requests.get(url)
     res.raise_for_status()
     soup = bs4.BeautifulSoup(res.text, "html.parser")
-    print('hello')
+    
 
 
 
