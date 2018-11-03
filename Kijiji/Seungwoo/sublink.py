@@ -8,6 +8,7 @@ import re
 
 def title_formatter(format_input):
     format_input = format_input.replace("\n", "")
+    format_input = format_input.replace(",", " ") 
     format_input = re.sub(r'\s+', ' ', format_input)
     format_input = format_input.replace("\\\\", "\\") 
     format_input = format_input.strip()
@@ -20,7 +21,9 @@ def price_formatter(price):
     return '$' + price.strip()
 
 def address_formatter(address):
-    return re.sub("|", '', address)
+    address = address.replace(",", " ")
+    address = re.sub(r'\s+', ' ', address)
+    return address
 
 def request_bs(url):
     res = requests.get(url)
@@ -32,7 +35,7 @@ url = 'https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281'
 # open csv file
 file_name = 'kijiji_info.csv'
 with open(file_name, 'w+') as output_file:
-    csv_writer = writer(output_file, delimiter='|')
+    csv_writer = writer(output_file, delimiter=',')
     csv_writer.writerow(["Title", "Price", "Address", "Bathroom", "Room", "Furnished", "Pet Allowed"])
 
 soup = request_bs(url)
@@ -56,7 +59,6 @@ while start < 200:
         # checking each element's detail.
         sublink = 'http://www.kijiji.ca' + titles[i].get('href')
         subsoup = request_bs(sublink)
-        print(sublink)
         # please refer to price_formatter function
         price = price_formatter(subsoup.select_one('span[class*="currentPrice"]').text)
 
@@ -80,7 +82,7 @@ while start < 200:
             animal = 'Unknown'
 
         with open(file_name, "a", encoding='UTF-8') as output_file:
-            csv_writer = writer(output_file, delimiter='|')
+            csv_writer = writer(output_file, delimiter=',')
             csv_writer.writerow([title, price, address, bathroom, room, furnished, animal])
         
     nextpageLink = soup.select('a[title="Suivante"]')[0]
