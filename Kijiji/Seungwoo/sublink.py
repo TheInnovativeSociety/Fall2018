@@ -47,40 +47,42 @@ length = len(informationDIV) # to know how many items exist on 1 page.
 # Even if it shows that there are more posts, it is not recheable 
 MAXIMUM = 2000
 start = 0
-while start < 200:
+while start < 2000:
     number_of_articles = len(soup.select('div .info-container'))
     for i in range(len(informationDIV)):
-        start = start + 1
-        titles = soup.select('div .info-container > .title > a')
-
-        # getting title
-        title = title_formatter(titles[i].getText())
-
-        # checking each element's detail.
-        sublink = 'http://www.kijiji.ca' + titles[i].get('href')
-        subsoup = request_bs(sublink)
-        # please refer to price_formatter function
-        price = price_formatter(subsoup.select_one('span[class*="currentPrice"]').text)
-
-        address = address_formatter(subsoup.select_one('span[itemprop="address"]').text)
-
-        child_bathroom = subsoup.find(text=re.compile('Salles de bain')).parent
-        bathroom = re.findall('\d+', child_bathroom.parent.select_one('dd').text)[0]
-
-        child_room = subsoup.find(text=re.compile('Chambres')).parent
-        room = child_room.parent.select_one('dd').text
         try:
-            child_furnished = subsoup.find(text=re.compile('Meublé')).parent
-            furnished = child_furnished.parent.select_one('dd').text
-        except:
-            furnished = 'Unknown'
+            start = start + 1
+            titles = soup.select('div .info-container > .title > a')
 
-        try:
-            child_animal = subsoup.find(text=re.compile('Animaux acceptés')).parent
-            animal = child_animal.parent.select_one('dd').text
-        except:
-            animal = 'Unknown'
+            # getting title
+            title = title_formatter(titles[i].getText())
 
+            # checking each element's detail.
+            sublink = 'http://www.kijiji.ca' + titles[i].get('href')
+            subsoup = request_bs(sublink)
+            # please refer to price_formatter function
+            price = price_formatter(subsoup.select_one('span[class*="currentPrice"]').text)
+
+            address = address_formatter(subsoup.select_one('span[itemprop="address"]').text)
+
+            child_bathroom = subsoup.find(text=re.compile('Salles de bain')).parent
+            bathroom = re.findall('\d+', child_bathroom.parent.select_one('dd').text)[0]
+
+            child_room = subsoup.find(text=re.compile('Chambres')).parent
+            room = child_room.parent.select_one('dd').text
+            try:
+                child_furnished = subsoup.find(text=re.compile('Meublé')).parent
+                furnished = child_furnished.parent.select_one('dd').text
+            except:
+                furnished = 'Unknown'
+
+            try:
+                child_animal = subsoup.find(text=re.compile('Animaux acceptés')).parent
+                animal = child_animal.parent.select_one('dd').text
+            except:
+                animal = 'Unknown'
+        except:
+            pass
         with open(file_name, "a", encoding='UTF-8') as output_file:
             csv_writer = writer(output_file, delimiter=',')
             csv_writer.writerow([title, price, address, bathroom, room, furnished, animal])
