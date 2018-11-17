@@ -25,7 +25,7 @@ containers = page_soup.findAll("li", {"class":"result-row"})
 filename = "apartments.csv"
 f = open(filename, "w")
 
-headers = "title\n"
+headers = "title, price\n"
 
 f.write(headers)
 
@@ -37,13 +37,13 @@ for container in containers:
     #**was able to print out the titles of the post currently working on 
     #printing out the prices
     
-   #price_container = container.findAll("span", {"class":"result-price"})
-   #price = price_container[0].text
+    price_container = container.findAll("span", {"class":"result-price"})
+    price = price_container[0].text
     
     print("title: " + title)
-    #print("price: " + price)
+    print("price: " + price)
     
-    f.write(title + "\n")
-    #f.write(title + "," +  price + "\n")
+    #f.write(title + "\n")
+    f.write(title + "," +  price + "\n")
     
 f.close()    
