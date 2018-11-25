@@ -17,7 +17,7 @@ import re
 maxPage = 2163
 
 # "Open" csv to write header
-with open('du_proprio_scraped.csv', "w") as csv_file:
+with open('data/du_proprio_scraped.csv', "w") as csv_file:
     csv_writer = writer(csv_file)
     csv_writer.writerow(["Rent Price", "Address", "Location", "Number of Bed", "Number of Bath", "Living Area (ft^2)", "Land Area (ft^2)"])
 
@@ -35,7 +35,7 @@ for pgnum in range(1,maxPage+1):
     posting_elements = posting_list.find_all(class_="search-results-listings-list__item")
 
     # "Open" csv to start writing scraped data
-    with open("du_proprio_scraped.csv", "a") as csv_file:
+    with open("data/du_proprio_scraped.csv", "a") as csv_file:
         csv_writer = writer(csv_file)
 
         # Scrape desired variables from individual ads on search page "search-results-listings-list__item"
